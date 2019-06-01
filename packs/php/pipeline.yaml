@@ -1,0 +1,22 @@
+agent:
+  label: jenkins-php
+  container: php
+pipelines:
+  pullRequest:
+    build:
+      steps:
+      - sh: ./vendor/bin/phpunit
+        name: phpunit
+  release:
+    setVersion:
+      steps:
+      - sh: echo \$(jx-release-version) > VERSION
+        name: next-version
+        comment: so we can retrieve the version in later steps
+      # TODO set the version in source?
+      - sh: jx step tag --version \$(cat VERSION)
+        name: tag-version
+    build:
+      steps:
+      - sh: ./vendor/bin/phpunit
+        name: phpunit
